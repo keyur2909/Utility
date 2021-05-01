@@ -1,0 +1,70 @@
+﻿@page "/"
+
+    <div class="container shadow-lg">
+        <h3>Send Mail</h3>
+        <div>
+            @if (Status != null)
+            {
+                <label class="alert-success">@Status</label>
+            }
+            @if (ErrorMessage != null)
+            {
+                <label class="alert-danger">@ErrorMessage</label>
+            }
+        </div>
+        <EditForm Model="@EmailData" OnValidSubmit="SendMail" >
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label for="kp_name">Name:</label>
+                <input type="text" class="form-control" @bind-value="EmailData.Name" id="kp_name" placeholder="Enter your name:">
+                <ValidationMessage For="@(() => EmailData.Name)" />
+            </div>
+            <div class="form-group">
+                <label for="kp_email">Email address:</label>
+                <input type="email" class="form-control" @bind-value="EmailData.ToEmail" id="kp_email" placeholder="Enter your mail address:">
+                <ValidationMessage For="@(() => EmailData.ToEmail)" />
+            </div>
+            <div class="form-group">
+                <label for="kp_subject">Subject:</label>
+                <input type="text" class="form-control" @bind-value="EmailData.Subject" id="kp_subject" placeholder="Enter subject:">
+                <ValidationMessage For="@(() => EmailData.Subject)" />
+            </div>
+            <div class="form-group">
+                <label for="exampleFormControlTextarea1">Message:</label>
+                <textarea class="form-control" id="kp_message" @bind="EmailData.Message" rows="3"></textarea>
+                <ValidationMessage For="@(() => EmailData.Message)" />
+            </div>
+            <div>
+                <button type="submit" @onclick="SendMail" class="btn btn-primary">Submit</button>
+                <button type="submit" @onclick="ClearFields" class="btn btn-light">Cancel</button>
+            </div>
+
+        </EditForm>
+    </div>
+    @code {
+
+        public EmailData EmailData { get; set; } = new EmailData();
+
+        MailSendService MailSendService;
+        public string ErrorMessage { get; set; }
+        public string Status { get; set; }
+        private void SendMail()
+        {
+            if (EmailData.ToEmail != null)
+            {
+                ErrorMessage = String.Empty;
+                Status = String.Empty;
+                MailSendService.SendMail(EmailData);
+                Status = "Message sent successfully.";
+                EmailData = new EmailData();
+            }
+            else
+            {
+                ErrorMessage = "Please enter mail address.";
+            }
+        }
+        private void ClearFields() 
+        {
+            EmailData = new EmailData();
+        }
+    }
